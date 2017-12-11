@@ -3,9 +3,67 @@
   <head>
     <meta charset="utf-8">
     <title>Genetics</title>
-    <script src="./js/main.js" charset="utf-8"></script>
+    <style media="screen">
+      table{
+        border: black thin solid;
+        border-collapse:collapse;
+      }
+      td, th{
+        border: black thin solid;
+      }
+    </style>
+    <script src="./js/main.js" type="text/javascript" charset="utf-8"></script>
   </head>
   <body>
-
+    <!-- GG x gg = 100% G -->
+    <!-- Gg x gg = 50% G 50% g -->
+    <input id="geneCount" type="number" min="1" max="6" value="1"/>
+    <div id="par1-genes">
+      <input placeholder="Parent 1" class="par1-gene"/>
+    </div>
+    <div id="par2-genes">
+      <input placeholder="Parent 2" class="par2-gene"/>
+    </div>
+    <button id="SubmitGenes">Submit</button>
+    <template id="par1-input">
+      <input placeholder="Parent 1" class="par1-gene"/>
+    </template>
+    <template id="par2-input">
+      <input placeholder="Parent 2" class="par2-gene"/>
+    </template>
+    <template id="par1-gene">
+      <th class="par1"></th>
+      <th class="par1"></th>
+    </template>
+    <template id="par2-gene">
+      <tr>
+        <th class="par2"></th>
+      </tr>
+      <tr>
+        <th class="par2"></th>
+      </tr>
+    </template>
+    <template id="allele-template">
+      <td class="allele"></td>
+    </template>
+    <table id="Punnet">
+      <tr id="par1">
+        <th class="empty"></th>
+        <th class="par1" id="par1-a">G</th>
+        <th class="par1" id="par1-b">G</th>
+      </tr>
+      <tbody id="par2">
+        <tr>
+          <td class="par2" id="par2-a">g</td>
+          <td class="allele"></td>
+          <td class="allele"></td>
+        </tr>
+        <tr>
+          <td class="par2" id="par2-b">g</td>
+          <td class="allele"></td>
+          <td class="allele"></td>
+        </tr>
+      </tbody>
+    </table>
   </body>
 </html>
