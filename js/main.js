@@ -39,6 +39,17 @@ Array.prototype.expandValues = function(){
 function flatten(array) {
    return Array.isArray(array) ? [].concat.apply([], array.map(flatten)) : array;
 }
+
+Number.prototype.constrain = function(min,max){
+  return Math.max(min,Math.min(max,this));
+};
+
+HTMLElement.prototype.clear = function(){
+  for(let child = this.children.length - 1; child >= 0; child--){
+    this.removeChild(this.children[child]);
+  }
+};
+
 Array.prototype.punnettFOIL = function(traitCount){
   let traits = [];
   let exclude = [];
@@ -83,28 +94,98 @@ function EmptyPart(partType){
   return emptyPart;
 }
 
+function styleAlleles(){
+  document.querySelector('#freqList').clear();
+  document.querySelector('#infoList').clear();
+  let AlleleList = document.querySelectorAll('.allele');
+  let AlFrequency = {
+    "_info":{
+      "_size": AlleleList.length,
+      "_variance": 0
+    }
+  };
+  AlleleList.forEach((Al)=>{
+    if(!AlFrequency[Al.textContent]){
+      AlFrequency[Al.textContent]={
+        "count":0,
+        "freq": 0,
+        "freqPrc": 0,
+        "name": Al.textContent,
+        "id": AlFrequency._info._variance,
+        "color": "rgb($r,$g,$b)"
+      };
+      AlFrequency._info._variance++;
+    }
+    AlFrequency[Al.textContent].count++;
+  });
+  for(let Al in AlFrequency){
+    if(Al != "_info"){
+      AlFrequency[Al].freq = AlFrequency[Al].count / AlFrequency._info._size
+      AlFrequency[Al].freqPrc = AlFrequency[Al].freq * 100;
+    }
+  }
+  for(let Al in AlFrequency){
+    if(Al != "_info"){
+      let AlRed   = Math.round(Math.sin(AlFrequency[Al].freq*(AlFrequency._info._variance))*255).constrain(0,255);
+      let AlGreen = Math.round(Math.cos(AlFrequency[Al].freq*(AlFrequency._info._variance))*255).constrain(0,255);
+      let AlBlue  = Math.round(Math.tan(AlFrequency[Al].freq*(AlFrequency._info._variance))*255).constrain(0,255);
+      AlFrequency[Al].color = AlFrequency[Al].color
+      .replace("$r", AlRed)
+      .replace("$g", AlGreen)
+      .replace("$b", AlBlue);
+      document.querySelector('#freqList').appendChild(createAlleleInfo(AlFrequency[Al]));
+    }
+  }
+  AlleleList.forEach((Al)=>{
+    Al.style.backgroundColor = AlFrequency[Al.textContent].color;
+  });
+  document.querySelector('#infoList').appendChild(createAlleleTotal(AlFrequency));
+}
+
+function createAlleleTotal(AlFreq){
+  let AlTotal = document.createElement('tr');
+  AlTotal.setAttribute('class', 'alleleTotal');
+  AlTotal.appendChild(EmptyPart('td'));
+  let AlSize = document.createElement('td');
+  AlSize.textContent = AlFreq._info._size;
+  AlTotal.appendChild(AlSize);
+  let AlUnique = document.createElement('td');
+  AlUnique.textContent = AlFreq._info._variance;
+  AlTotal.appendChild(AlUnique);
+  return AlTotal;
+}
+
+function createAlleleInfo(allele){
+  let newAlleleInfo = document.createElement('tr');
+  newAlleleInfo.setAttribute('class', 'alleleInfo');
+  let newAlleleName = document.createElement('td');
+  newAlleleName.textContent = allele.name;
+  newAlleleInfo.appendChild(newAlleleName);
+  let newAlleleFreq = document.createElement('td');
+  newAlleleFreq.textContent = allele.freqPrc+"%";
+  newAlleleInfo.appendChild(newAlleleFreq);
+  let newAlleleCount = document.createElement('td');
+  newAlleleCount.textContent = allele.count;
+  newAlleleInfo.appendChild(newAlleleCount);
+  return newAlleleInfo;
+}
+
 function createAllele(allele){
   let newAllele = document.createElement('td');
+  newAllele.setAttribute('class', 'allele');
   newAllele.textContent = allele;
   return newAllele;
 }
 
 function CreateGenes(e){
-  console.log(e)
-  for(let child = par1_table.children.length - 1; child >= 0; child--){
-    par1_table.removeChild(par1_table.children[child]);
-  }
-  for(let child = par2_table.children.length - 1; child >= 0; child--){
-    par2_table.removeChild(par2_table.children[child]);
-  }
+  par1_table.clear();
+  par2_table.clear();
   par1_table.appendChild(EmptyPart('th'));
-  console.log(GeneCount.valueAsNumber)
   let alleleMatrix = [];
   let par1_punnett = [];
   let par2_punnett = [];
   for (var i = 0; i < 2; i++) {
     par1_inputs.querySelectorAll(".par1-gene").forEach((gene)=>{
-      console.log(gene.value)
       par1_punnett.push(gene.value[i%2]);
     });
     par2_inputs.querySelectorAll(".par2-gene").forEach((gene)=>{
@@ -113,6 +194,7 @@ function CreateGenes(e){
   }
   par1_punnett = par1_punnett.punnettFOIL(GeneCount.valueAsNumber);
   par2_punnett = par2_punnett.punnettFOIL(GeneCount.valueAsNumber);
+  console.log(par1_punnett,par2_punnett)
   for(let genes = 0; genes < Math.pow(2,GeneCount.valueAsNumber); genes++){
     TEMP_par1_gene.content.querySelectorAll(".par1").forEach((gene)=>{
       let input_list = [...TEMP_par1_gene.content.querySelectorAll(".par1")];
@@ -129,16 +211,25 @@ function CreateGenes(e){
     par1_table.appendChild(clone1);
     let clone2 = document.importNode(TEMP_par2_gene.content, true);
     par2_table.appendChild(clone2);
-    console.log(TEMP_par1_gene.content)
   }
   for(let alleleX = 0; alleleX < par1_punnett.length; alleleX++){
     for(let alleleY = 0; alleleY < par2_punnett.length; alleleY++){
       let allele = (par1_punnett[alleleX] + par2_punnett[alleleY]).toAllele();
-      console.log(allele, par1_punnett[alleleX])
-      par2_table.children[alleleY].appendChild(createAllele(allele));
+      if(allele.length==2){
+        allele = allele.split('').sort((a,b)=>{return a>b}).join('');
+      }
+      if(!alleleMatrix[alleleY]){
+        alleleMatrix.push([]);
+      }
+      alleleMatrix[alleleY].push(allele);
     }
   }
-  console.log(par1_punnett,par2_punnett)
+  for(let x = 0; x < alleleMatrix.length; x++){
+    for(let y = 0; y < alleleMatrix[x].length; y++){
+      par2_table.children[x].appendChild(createAllele(alleleMatrix[x][y]));
+    }
+  }
+  styleAlleles();
 }
 
 window.addEventListener('load',function(){
@@ -155,7 +246,6 @@ window.addEventListener('load',function(){
   subButton       = document.querySelector("#SubmitGenes");
   subButton.addEventListener('click', CreateGenes);
   GeneCount.addEventListener('change',function(e){
-    console.log(e.srcElement.valueAsNumber)
     for(let child = par1_inputs.children.length - 1; child >= 0; child--){
       par1_inputs.removeChild(par1_inputs.children[child]);
     }

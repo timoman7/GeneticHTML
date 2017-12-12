@@ -8,8 +8,24 @@
         border: black thin solid;
         border-collapse:collapse;
       }
+      table#parInput tr td input{
+        border: none;
+        width: 20px;
+      }
+      table#parInput{
+        border:none;
+        border-collapse: collapse;
+      }
+      table#parInput tr, th, td{
+        border:none;
+      }
       td, th{
         border: black thin solid;
+      }
+      .par1-gene, .par2-gene{
+        border-collapse: collapse;
+        padding-left: 0px;
+        padding-right: 0px;
       }
     </style>
     <script src="./js/main.js" type="text/javascript" charset="utf-8"></script>
@@ -18,18 +34,28 @@
     <!-- GG x gg = 100% G -->
     <!-- Gg x gg = 50% G 50% g -->
     <input id="geneCount" type="number" min="1" max="6" value="1"/>
-    <div id="par1-genes">
-      <input placeholder="Parent 1" maxlength="2" class="par1-gene"/>
-    </div>
-    <div id="par2-genes">
-      <input placeholder="Parent 2" maxlength="2" class="par2-gene"/>
-    </div>
+    <table id="parInput">
+      <tr id="par1-genes">
+        <td>
+          <input placeholder="P1" maxlength="2" class="par1-gene"/>
+        </td>
+      </tr>
+      <tr id="par2-genes">
+        <td>
+          <input placeholder="P2" maxlength="2" class="par2-gene"/>
+        </td>
+      </tr>
+    </table>
     <button id="SubmitGenes">Submit</button>
     <template id="par1-input">
-      <input placeholder="Parent 1" maxlength="2" class="par1-gene"/>
+      <td>
+        <input placeholder="P1" maxlength="2" class="par1-gene"/>
+      </td>
     </template>
     <template id="par2-input">
-      <input placeholder="Parent 2" maxlength="2" class="par2-gene"/>
+      <td>
+        <input placeholder="P2" maxlength="2" class="par2-gene"/>
+      </td>
     </template>
     <template id="par1-gene">
       <th class="par1"></th>
@@ -63,6 +89,24 @@
           <td class="allele"></td>
           <td class="allele"></td>
         </tr>
+      </tbody>
+    </table>
+    <table id="freq">
+      <tr>
+        <th>Allele</th>
+        <th>Frequency</th>
+        <th>Count</th>
+      </tr>
+      <tbody id="freqList">
+
+      </tbody>
+      <tr>
+        <th>Total</th>
+        <th>Alleles</th>
+        <th>Unique Alleles</th>
+      </tr>
+      <tbody id="infoList">
+
       </tbody>
     </table>
   </body>
