@@ -13,22 +13,80 @@ let even= 0;
 let odd = 1;
 
 String.prototype.toAllele = function(){
-  return this.split("").sort((a,b)=>{return a.toLowerCase()!=b.toLowerCase() ? a<b : a>b});
+  let newString = [];
+  let _newString = this;
+  _newString = _newString.split("").sort((a,b)=>{return (a.toLowerCase() > b.toLowerCase())}).join('');
+  for(var i = 0; i < _newString.length; i+=2){
+    newString.push(_newString[i]+_newString[i+1]);
+  }
+  let __newString = "";
+  newString.forEach((str)=>{
+    __newString += str.split('').sort((a,b)=>{return a.toLowerCase()<b.toLowerCase()}).join('');
+  });
+  //a>b
+  return __newString;
 }
 
+Array.prototype.expandValues = function(){
+  let retArray = [];
+  for(let ind = 0; ind < arguments.length; ind++){
+    retArray.push(this[arguments[ind]]);
+  }
+  return retArray;
+}
+// Order  012 015 042 045
+//        312 315 342 345
+function flatten(array) {
+   return Array.isArray(array) ? [].concat.apply([], array.map(flatten)) : array;
+}
 Array.prototype.punnettFOIL = function(traitCount){
+  let traits = [];
+  let exclude = [];
+  let whole = [];
+  let firstHalf = [];
+  let secondHalf = [];
+  let stringCounter = {};
   if(traitCount == 1){
     return this
   }else{
-
+    for(var i = 0; i < 2; i++){
+      let baseTrait = i*traitCount;
+      exclude.push(baseTrait);
+      i == 0 ? firstHalf.push(this.join('').substr(0,traitCount)) : secondHalf.push(this.join('').substr(traitCount,traitCount));
+    }
+    for(let _ind=0;_ind<firstHalf[0].split('').length;_ind++){
+      whole.push(firstHalf[0].split('')[_ind]+secondHalf[0].split('')[_ind]);
+    }
+    for(let _ind=0;_ind<traitCount;_ind++){
+      stringCounter[firstHalf[0][_ind].toUpperCase()]=0;
+    }
+    for(let i = 0; i < Math.pow(2,traitCount); i++){
+      //By the end of the for loop, add something to traits
+      let traitString = "";
+      let sStart = Math.floor(i/(Math.pow(2,traitCount)/2));
+      for(let tInd = 0; tInd < traitCount; tInd++){
+        let counter = Math.floor(stringCounter[whole[tInd][0].toUpperCase()]);
+        let mod = (((traitCount)-tInd));
+        traitString += whole[tInd][counter%2];
+        stringCounter[whole[tInd][0].toUpperCase()]+=1/mod;
+      }
+      //console.log(sStart)
+      traits.push(traitString);
+    }
   }
-  console.log(this, traitCount)
-}
+  return traits;
+};
 
 function EmptyPart(partType){
   let emptyPart = document.createElement(partType);
   emptyPart.class = "empty";
   return emptyPart;
+}
+
+function createAllele(allele){
+  let newAllele = document.createElement('td');
+  newAllele.textContent = allele;
+  return newAllele;
 }
 
 function CreateGenes(e){
@@ -44,30 +102,27 @@ function CreateGenes(e){
   let alleleMatrix = [];
   let par1_punnett = [];
   let par2_punnett = [];
-  for(let genes = 0; genes < GeneCount.valueAsNumber; genes++){
-
-    for (var i = 0; i < GeneCount.valueAsNumber * 2; i++) {
-      par1_inputs.querySelectorAll(".par1-gene").forEach((gene)=>{
-        par1_punnett.push(gene.value[i%2]);
-      });
-      par2_inputs.querySelectorAll(".par2-gene").forEach((gene)=>{
-        par2_punnett.push(gene.value[i%2]);
-      });
-    }
-    par1_punnett.punnettFOIL(GeneCount.valueAsNumber);
-    par2_punnett.punnettFOIL(GeneCount.valueAsNumber);
-
+  for (var i = 0; i < 2; i++) {
+    par1_inputs.querySelectorAll(".par1-gene").forEach((gene)=>{
+      console.log(gene.value)
+      par1_punnett.push(gene.value[i%2]);
+    });
+    par2_inputs.querySelectorAll(".par2-gene").forEach((gene)=>{
+      par2_punnett.push(gene.value[i%2]);
+    });
+  }
+  par1_punnett = par1_punnett.punnettFOIL(GeneCount.valueAsNumber);
+  par2_punnett = par2_punnett.punnettFOIL(GeneCount.valueAsNumber);
+  for(let genes = 0; genes < Math.pow(2,GeneCount.valueAsNumber); genes++){
     TEMP_par1_gene.content.querySelectorAll(".par1").forEach((gene)=>{
       let input_list = [...TEMP_par1_gene.content.querySelectorAll(".par1")];
       let LR = input_list.indexOf(gene);
-      let respective_item = Math.floor(LR/2);
-      gene.innerHTML = par1_inputs.children[genes].value[LR];
+      gene.innerHTML = par1_punnett[genes];
     });
     TEMP_par2_gene.content.querySelectorAll(".par2").forEach((gene)=>{
       let input_list = [...TEMP_par2_gene.content.querySelectorAll(".par2")];
       let LR = input_list.indexOf(gene);
-      let respective_item = Math.floor(LR/2);
-      gene.innerHTML = par2_inputs.children[genes].value[LR];
+      gene.innerHTML = par2_punnett[genes];
     });
 
     let clone1 = document.importNode(TEMP_par1_gene.content, true);
@@ -75,8 +130,12 @@ function CreateGenes(e){
     let clone2 = document.importNode(TEMP_par2_gene.content, true);
     par2_table.appendChild(clone2);
     console.log(TEMP_par1_gene.content)
-    for(let alleles = 0; alleles < Math.pow(2 * GeneCount.valueAsNumber, 2); alleles++){
-      //console.log(Math.floor(alleles / (2 * GeneCount.valueAsNumber)), (alleles % (2 * GeneCount.valueAsNumber)))
+  }
+  for(let alleleX = 0; alleleX < par1_punnett.length; alleleX++){
+    for(let alleleY = 0; alleleY < par2_punnett.length; alleleY++){
+      let allele = (par1_punnett[alleleX] + par2_punnett[alleleY]).toAllele();
+      console.log(allele, par1_punnett[alleleX])
+      par2_table.children[alleleY].appendChild(createAllele(allele));
     }
   }
   console.log(par1_punnett,par2_punnett)

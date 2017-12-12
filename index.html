@@ -19,29 +19,29 @@
     <!-- Gg x gg = 50% G 50% g -->
     <input id="geneCount" type="number" min="1" max="6" value="1"/>
     <div id="par1-genes">
-      <input placeholder="Parent 1" class="par1-gene"/>
+      <input placeholder="Parent 1" maxlength="2" class="par1-gene"/>
     </div>
     <div id="par2-genes">
-      <input placeholder="Parent 2" class="par2-gene"/>
+      <input placeholder="Parent 2" maxlength="2" class="par2-gene"/>
     </div>
     <button id="SubmitGenes">Submit</button>
     <template id="par1-input">
-      <input placeholder="Parent 1" class="par1-gene"/>
+      <input placeholder="Parent 1" maxlength="2" class="par1-gene"/>
     </template>
     <template id="par2-input">
-      <input placeholder="Parent 2" class="par2-gene"/>
+      <input placeholder="Parent 2" maxlength="2" class="par2-gene"/>
     </template>
     <template id="par1-gene">
       <th class="par1"></th>
-      <th class="par1"></th>
+      <!-- <th class="par1"></th> -->
     </template>
     <template id="par2-gene">
       <tr>
         <th class="par2"></th>
       </tr>
-      <tr>
+      <!-- <tr>
         <th class="par2"></th>
-      </tr>
+      </tr> -->
     </template>
     <template id="allele-template">
       <td class="allele"></td>
