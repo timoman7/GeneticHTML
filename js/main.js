@@ -21,7 +21,7 @@ String.prototype.toAllele = function(){
   }
   let __newString = "";
   newString.forEach((str)=>{
-    __newString += str.split('').sort((a,b)=>{return a.toLowerCase()<b.toLowerCase()}).join('');
+    __newString += str.split('').sort((a,b)=>{return a>b}).join('');
   });
   //a>b
   return __newString;
@@ -112,7 +112,7 @@ function styleAlleles(){
         "freqPrc": 0,
         "name": Al.textContent,
         "id": AlFrequency._info._variance,
-        "color": "rgb($r,$g,$b)"
+        "color": "hsl($c,100%,$b%)"
       };
       AlFrequency._info._variance++;
     }
@@ -124,15 +124,20 @@ function styleAlleles(){
       AlFrequency[Al].freqPrc = AlFrequency[Al].freq * 100;
     }
   }
+  let colorArray = [];
+  for(let c = 0; c < 316; c += 315 / AlFrequency._info._variance){
+    colorArray.push(`hsl(${Math.round(c)}, 100%, 65%)`)
+  }
+
   for(let Al in AlFrequency){
     if(Al != "_info"){
-      let AlRed   = Math.round(Math.sin(AlFrequency[Al].freq*(AlFrequency._info._variance))*255).constrain(0,255);
-      let AlGreen = Math.round(Math.cos(AlFrequency[Al].freq*(AlFrequency._info._variance))*255).constrain(0,255);
-      let AlBlue  = Math.round(Math.tan(AlFrequency[Al].freq*(AlFrequency._info._variance))*255).constrain(0,255);
-      AlFrequency[Al].color = AlFrequency[Al].color
-      .replace("$r", AlRed)
-      .replace("$g", AlGreen)
-      .replace("$b", AlBlue);
+      //let AlColor   = ;
+      //Math.round(Math.sin(AlFrequency[Al].freq*(AlFrequency._info._variance))*255).constrain(0,255)
+      //let AlBright  = 65;
+      AlFrequency[Al].color = colorArray[AlFrequency[Al].id];
+      // AlFrequency[Al].color = AlFrequency[Al].color
+      // .replace("$c", Math.round(AlColor))
+      // .replace("$b", AlBright);
       document.querySelector('#freqList').appendChild(createAlleleInfo(AlFrequency[Al]));
     }
   }
@@ -181,7 +186,7 @@ function CreateGenes(e){
   par1_table.clear();
   par2_table.clear();
   par1_table.appendChild(EmptyPart('th'));
-  let alleleMatrix = [];
+  window.alleleMatrix = [];
   let par1_punnett = [];
   let par2_punnett = [];
   for (var i = 0; i < 2; i++) {
@@ -194,7 +199,6 @@ function CreateGenes(e){
   }
   par1_punnett = par1_punnett.punnettFOIL(GeneCount.valueAsNumber);
   par2_punnett = par2_punnett.punnettFOIL(GeneCount.valueAsNumber);
-  console.log(par1_punnett,par2_punnett)
   for(let genes = 0; genes < Math.pow(2,GeneCount.valueAsNumber); genes++){
     TEMP_par1_gene.content.querySelectorAll(".par1").forEach((gene)=>{
       let input_list = [...TEMP_par1_gene.content.querySelectorAll(".par1")];
