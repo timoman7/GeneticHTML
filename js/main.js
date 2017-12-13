@@ -25,7 +25,7 @@ String.prototype.toAllele = function(){
   });
   //a>b
   return __newString;
-}
+};
 
 Array.prototype.expandValues = function(){
   let retArray = [];
@@ -33,7 +33,7 @@ Array.prototype.expandValues = function(){
     retArray.push(this[arguments[ind]]);
   }
   return retArray;
-}
+};
 // Order  012 015 042 045
 //        312 315 342 345
 function flatten(array) {
@@ -42,6 +42,40 @@ function flatten(array) {
 
 Number.prototype.constrain = function(min,max){
   return Math.max(min,Math.min(max,this));
+};
+
+Object.toArray = function(obj, key){
+  let newArr = [];
+  key = key ? key : "__name";
+  for(let prop in obj){
+    obj[prop][key] = prop;
+    newArr.push(obj[prop]);
+  }
+  obj = newArr;
+  return obj;
+};
+
+Object.removeProperty = function(obj, prop){
+  let newObj = {};
+  for(let i in obj){
+    if(i != prop){
+      newObj[i] = obj[i];
+    }
+  }
+  obj = newObj;
+  return obj;
+};
+
+Array.toObject = function(arr, key){
+  let newObj = {};
+  key = key ? key : "__name";
+  for(let ind = 0; ind < arr.length; ind++){
+    let item = arr[ind];
+    newObj[item[key]] = item;
+    newObj[item[key]] = Object.removeProperty(newObj[item[key]],key);
+  }
+  arr = newObj;
+  return arr;
 };
 
 HTMLElement.prototype.clear = function(){
@@ -101,49 +135,49 @@ function styleAlleles(){
   let AlFrequency = {
     "_info":{
       "_size": AlleleList.length,
-      "_variance": 0
+      "_variance": 0,
+      "_colorArray": []
+    },
+    "alleles":{
+
     }
   };
   AlleleList.forEach((Al)=>{
-    if(!AlFrequency[Al.textContent]){
-      AlFrequency[Al.textContent]={
+    if(!AlFrequency.alleles[Al.textContent]){
+      AlFrequency.alleles[Al.textContent]={
         "count":0,
         "freq": 0,
         "freqPrc": 0,
         "name": Al.textContent,
         "id": AlFrequency._info._variance,
-        "color": "hsl($c,100%,$b%)"
+        "color": "hsl(0,100%,65%)"
       };
       AlFrequency._info._variance++;
     }
-    AlFrequency[Al.textContent].count++;
+    AlFrequency.alleles[Al.textContent].count++;
   });
-  for(let Al in AlFrequency){
-    if(Al != "_info"){
-      AlFrequency[Al].freq = AlFrequency[Al].count / AlFrequency._info._size
-      AlFrequency[Al].freqPrc = AlFrequency[Al].freq * 100;
-    }
+  for(let Al in AlFrequency.alleles){
+    AlFrequency.alleles[Al].freq = AlFrequency.alleles[Al].count / AlFrequency._info._size;
+    AlFrequency.alleles[Al].freqPrc = AlFrequency.alleles[Al].freq * 100;
   }
-  let colorArray = [];
   for(let c = 0; c < 316; c += 315 / AlFrequency._info._variance){
-    colorArray.push(`hsl(${Math.round(c)}, 100%, 65%)`)
+    AlFrequency._info._colorArray.push(`hsl(${Math.round(c)}, 100%, 65%)`);
   }
 
-  for(let Al in AlFrequency){
-    if(Al != "_info"){
-      //let AlColor   = ;
-      //Math.round(Math.sin(AlFrequency[Al].freq*(AlFrequency._info._variance))*255).constrain(0,255)
-      //let AlBright  = 65;
-      AlFrequency[Al].color = colorArray[AlFrequency[Al].id];
-      // AlFrequency[Al].color = AlFrequency[Al].color
-      // .replace("$c", Math.round(AlColor))
-      // .replace("$b", AlBright);
-      document.querySelector('#freqList').appendChild(createAlleleInfo(AlFrequency[Al]));
-    }
+  for(let Al in AlFrequency.alleles){
+    //let AlColor   = ;
+    //Math.round(Math.sin(AlFrequency.alleles[Al].freq*(AlFrequency._info._variance))*255).constrain(0,255)
+    //let AlBright  = 65;
+    AlFrequency.alleles[Al].color = AlFrequency._info._colorArray[AlFrequency.alleles[Al].id];
+    // AlFrequency.alleles[Al].color = AlFrequency.alleles[Al].color
+    // .replace("$c", Math.round(AlColor))
+    // .replace("$b", AlBright);
   }
+  window.freqBackup = Object.assign(new Object, AlFrequency);
   AlleleList.forEach((Al)=>{
-    Al.style.backgroundColor = AlFrequency[Al.textContent].color;
+    Al.style.backgroundColor = AlFrequency.alleles[Al.textContent].color;
   });
+  updateFreqList(AlFrequency);
   document.querySelector('#infoList').appendChild(createAlleleTotal(AlFrequency));
 }
 
@@ -236,8 +270,49 @@ function CreateGenes(e){
   styleAlleles();
 }
 
+function updateFreqList(AlFreq){
+  document.querySelector('#freqList').clear();
+  for(let Al in AlFreq.alleles){
+    AlFreq.alleles[Al].color = AlFreq._info._colorArray[AlFreq.alleles[Al].id];
+    document.querySelector('#freqList').appendChild(createAlleleInfo(AlFreq.alleles[Al]));
+  }
+}
+
+function sortAlleles(prop, dir){
+  let AlFreq = Object.assign(new Object, window.freqBackup);
+  AlFreq.alleles = Object.toArray(AlFreq.alleles);
+  let valConvert = {
+    "freq": "freq",
+    "count": "count",
+    "none": "none",
+  };
+  let sortType = valConvert[prop];
+  if(sortType != "none"){
+    AlFreq.alleles.sort((AlleleA, AlleleB) => {
+      console.log(AlleleA, AlleleB);
+      let AlleleAVal = AlleleA[sortType];
+      let AlleleBVal = AlleleB[sortType];
+      // AlleleAVal = parseFloat(AlleleAVal.replace(/[ a-zA-Z]/g,""));
+      // AlleleBVal = parseFloat(AlleleBVal.replace(/[ a-zA-Z]/g,""));
+      if(dir == "asc"){
+        return (AlleleAVal > AlleleBVal ? 1 : (AlleleAVal == AlleleBVal ? 0 : -1));
+      }else if(dir == "dec"){
+        return (AlleleAVal < AlleleBVal ? 1 : (AlleleAVal == AlleleBVal ? 0 : -1));
+      }
+    });
+  }else{
+    AlFreq = Object.assign(new Object, window.freqBackup);
+    AlFreq = Object.toArray(AlFreq.alleles);
+  }
+  AlFreq.alleles = Array.toObject(AlFreq.alleles);
+  updateFreqList(AlFreq);
+}
+
 window.addEventListener('load',function(){
-  GeneCount = document.querySelector("#geneCount");
+  let sortGo      = document.querySelector('#sortGo');
+  let sortProp    = document.querySelector('#sortProp');
+  let sortDir     = document.querySelector('#sortDir');
+  GeneCount       = document.querySelector("#geneCount");
   TEMP_par1_input = document.querySelector("#par1-input");
   TEMP_par2_input = document.querySelector("#par2-input");
   TEMP_par1_gene  = document.querySelector("#par1-gene");
@@ -249,6 +324,9 @@ window.addEventListener('load',function(){
   par2_table      = document.querySelector("#par2");
   subButton       = document.querySelector("#SubmitGenes");
   subButton.addEventListener('click', CreateGenes);
+  sortGo.addEventListener('click',function(){
+    sortAlleles(sortDir.value,sortDir.value);
+  });
   GeneCount.addEventListener('change',function(e){
     for(let child = par1_inputs.children.length - 1; child >= 0; child--){
       par1_inputs.removeChild(par1_inputs.children[child]);

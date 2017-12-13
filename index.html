@@ -8,6 +8,13 @@
         border: black thin solid;
         border-collapse:collapse;
       }
+      table input{
+        border: none;
+        width: 20px;
+        border-collapse: collapse;
+        padding-left: 0px;
+        padding-right: 0px;
+      }
       table#parInput tr td input{
         border: none;
         width: 20px;
@@ -90,6 +97,25 @@
           <td class="allele"></td>
         </tr>
       </tbody>
+    </table>
+    <table>
+      <tr>
+        <th>
+          <select id="sortProp">
+            <option value="freq">Frequency</option>
+            <option value="none" selected>Nothing</option>
+          </select>
+        </th>
+        <th>
+          <select id="sortDir">
+            <option value="asc" selected>A-Z / Smallest to Largest</option>
+            <option value="dec">Z-A / Largest to Smallest</option>
+          </select>
+        </th>
+        <th>
+          <button id="sortGo">Sort</button>
+        </th>
+      </tr>
     </table>
     <table id="freq">
       <tr>
