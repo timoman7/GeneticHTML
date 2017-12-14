@@ -351,6 +351,16 @@ function updateGeneCount(e){
   });
 }
 
+function copyP1P2(){
+  let p1List = [];
+  [...document.querySelectorAll('.par1-gene')].forEach((a)=>{
+    p1List.push(a.value);
+  });
+  [...document.querySelectorAll('.par2-gene')].forEach((a)=>{
+    a.value = p1List[[...a.parentElement.parentElement.children].indexOf(a.parentElement)];
+  });
+}
+
 window.addEventListener('load',function(){
   let sortGo      = document.querySelector('#sortGo');
   let sortProp    = document.querySelector('#sortProp');
@@ -366,6 +376,8 @@ window.addEventListener('load',function(){
   par1_table      = document.querySelector("#par1");
   par2_table      = document.querySelector("#par2");
   subButton       = document.querySelector("#SubmitGenes");
+  copyButton      = document.querySelector("#copyP1P2");
+  copyButton.addEventListener('click', copyP1P2);
   subButton.addEventListener('click', CreateGenes);
   sortGo.addEventListener('click',function(){
     sortAlleles(sortProp.value,sortDir.value);

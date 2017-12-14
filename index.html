@@ -54,14 +54,58 @@
       #par2-header{
         transform: rotate(-90deg);
       }
+      .copy{
+        background-color: buttonface;
+        padding: 0px 0px 0px 0px;
+        margin: 0px 0px 0px 0px;
+        height: 100%;
+      }
+      #copyP1P2{
+        width: 140px;
+        padding: 0px 0px 0px 0px;
+        margin: 0px 0px 0px 0px;
+        border: none;
+        height: 100%;
+        -webkit-appearance: textarea;
+      }
+      #SubmitGenes{
+        width: 70px;
+        padding: 0px 0px 0px 0px;
+        margin: 0px 0px 0px 0px;
+        border: none;
+        height: 100%;
+        -webkit-appearance: textarea;
+      }
+      #geneCount{
+        text-align: center;
+        background-color: buttonface;
+        width: 50px;
+        padding: 0px 0px 0px 0px;
+        margin: 0px 0px 0px 0px;
+        border: none;
+        height: 100%;
+      }
+      #copyP1P2,#SubmitGenes,#geneCount:focus{
+        outline: none;
+      }
     </style>
     <script src="./js/main.js" type="text/javascript" charset="utf-8"></script>
   </head>
   <body>
     <!-- GG x gg = 100% G -->
     <!-- Gg x gg = 50% G 50% g -->
-    <input id="geneCount" type="number" min="1" max="32" value="1"/>
     <table id="parInput">
+      <col>
+      <col>
+      <col>
+      <colgroup></colgroup>
+      <tr class="copy">
+        <th rowspan="3">
+          <input id="geneCount" type="number" min="1" max="32" value="1"/>
+        </th>
+        <th rowspan="3" class="copy"><button id="copyP1P2">Copy traits down</button></th>
+        <th rowspan="3"><button id="SubmitGenes">Submit</button></th>
+      </tr>
       <tr id="par1-genes">
         <td>
           <input placeholder="P1" maxlength="2" class="par1-gene"/>
@@ -73,7 +117,6 @@
         </td>
       </tr>
     </table>
-    <button id="SubmitGenes">Submit</button>
     <template id="par1-input">
       <td>
         <input placeholder="P1" maxlength="2" class="par1-gene"/>
