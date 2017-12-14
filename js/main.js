@@ -197,6 +197,7 @@ function createAlleleTotal(AlFreq){
 function createAlleleInfo(allele){
   let newAlleleInfo = document.createElement('tr');
   newAlleleInfo.setAttribute('class', 'alleleInfo');
+  newAlleleInfo.style.backgroundColor = allele.color;
   let newAlleleName = document.createElement('td');
   newAlleleName.textContent = allele.name;
   newAlleleInfo.appendChild(newAlleleName);
@@ -289,9 +290,9 @@ function sortAlleles(prop, dir){
   let sortType = valConvert[prop];
   if(sortType != "none"){
     AlFreq.alleles.sort((AlleleA, AlleleB) => {
-      console.log(AlleleA, AlleleB);
       let AlleleAVal = AlleleA[sortType];
       let AlleleBVal = AlleleB[sortType];
+      console.log(prop, AlleleA[prop], AlleleAVal, AlleleB, AlleleBVal);
       // AlleleAVal = parseFloat(AlleleAVal.replace(/[ a-zA-Z]/g,""));
       // AlleleBVal = parseFloat(AlleleBVal.replace(/[ a-zA-Z]/g,""));
       if(dir == "asc"){
@@ -306,6 +307,39 @@ function sortAlleles(prop, dir){
   }
   AlFreq.alleles = Array.toObject(AlFreq.alleles);
   updateFreqList(AlFreq);
+}
+
+function updateGeneCount(e){
+  let geneSave = {
+    par1: [],
+    par2: []
+  };
+  document.querySelectorAll('.par1-gene').forEach((g)=>{
+    geneSave.par1.push(g.value);
+  });
+  document.querySelectorAll('.par2-gene').forEach((g)=>{
+    geneSave.par2.push(g.value);
+  });
+  for(let child = par1_inputs.children.length - 1; child >= 0; child--){
+    par1_inputs.removeChild(par1_inputs.children[child]);
+  }
+  for(let child = par2_inputs.children.length - 1; child >= 0; child--){
+    par2_inputs.removeChild(par2_inputs.children[child]);
+  }
+  for(let genes = 0; genes < e.srcElement.valueAsNumber; genes++){
+    // TEMP_par1_input
+    let clone1 = document.importNode(TEMP_par1_input.content, true);
+    par1_inputs.appendChild(clone1);
+    let clone2 = document.importNode(TEMP_par2_input.content, true);
+    par2_inputs.appendChild(clone2);
+  }
+  document.querySelectorAll('.par1-gene').forEach((g)=>{
+    g.value = geneSave.par1[[...g.parentElement.parentElement.children].indexOf(g.parentElement)] || "";
+  });
+  document.querySelectorAll('.par2-gene').forEach((g)=>{
+    g.value = geneSave.par2[[...g.parentElement.parentElement.children].indexOf(g.parentElement)] || "";
+  });
+  console.log(geneSave)
 }
 
 window.addEventListener('load',function(){
@@ -325,21 +359,7 @@ window.addEventListener('load',function(){
   subButton       = document.querySelector("#SubmitGenes");
   subButton.addEventListener('click', CreateGenes);
   sortGo.addEventListener('click',function(){
-    sortAlleles(sortDir.value,sortDir.value);
+    sortAlleles(sortProp.value,sortDir.value);
   });
-  GeneCount.addEventListener('change',function(e){
-    for(let child = par1_inputs.children.length - 1; child >= 0; child--){
-      par1_inputs.removeChild(par1_inputs.children[child]);
-    }
-    for(let child = par2_inputs.children.length - 1; child >= 0; child--){
-      par2_inputs.removeChild(par2_inputs.children[child]);
-    }
-    for(let genes = 0; genes < e.srcElement.valueAsNumber; genes++){
-      // TEMP_par1_input
-      let clone1 = document.importNode(TEMP_par1_input.content, true);
-      par1_inputs.appendChild(clone1);
-      let clone2 = document.importNode(TEMP_par2_input.content, true);
-      par2_inputs.appendChild(clone2);
-    }
-  });
+  GeneCount.addEventListener('change',updateGeneCount);
 });
