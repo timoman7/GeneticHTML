@@ -121,9 +121,12 @@ Array.prototype.punnettFOIL = function(traitCount){
   return traits;
 };
 
-function EmptyPart(partType){
+function EmptyPart(partType, extra){
   let emptyPart = document.createElement(partType);
   emptyPart.class = "empty";
+  for(let attr in extra){
+    emptyPart.setAttribute(attr, extra[attr]);
+  }
   return emptyPart;
 }
 
@@ -213,7 +216,6 @@ function createAllele(allele){
 function CreateGenes(e){
   par1_table.clear();
   par2_table.clear();
-  par1_table.appendChild(EmptyPart('th'));
   window.alleleMatrix = [];
   let par1_punnett = [];
   let par2_punnett = [];
@@ -227,6 +229,22 @@ function CreateGenes(e){
   }
   par1_punnett = par1_punnett.punnettFOIL(GeneCount.valueAsNumber);
   par2_punnett = par2_punnett.punnettFOIL(GeneCount.valueAsNumber);
+
+  let p1_header = document.querySelector('#par1-header');
+  p1_header.textContent = "";
+  p1_header.setAttribute('colspan', par1_punnett.length+1);
+  [...document.querySelectorAll('.par1-gene')].forEach((a)=>{
+    p1_header.textContent += a.value;
+  });
+  let headTemplate = document.querySelector('#par2-header-template');
+  let p2_header = headTemplate.content.querySelector('#par2-header');
+  p2_header.textContent = "";
+  p2_header.setAttribute('rowspan', par2_punnett.length+1);
+  [...document.querySelectorAll('.par2-gene')].forEach((a)=>{
+    p2_header.textContent += a.value;
+  });
+  let cloneHeader = document.importNode(headTemplate.content, true);
+  par2_table.appendChild(cloneHeader);
   for(let genes = 0; genes < Math.pow(2,GeneCount.valueAsNumber); genes++){
     TEMP_par1_gene.content.querySelectorAll(".par1").forEach((gene)=>{
       let input_list = [...TEMP_par1_gene.content.querySelectorAll(".par1")];
@@ -258,7 +276,7 @@ function CreateGenes(e){
   }
   for(let x = 0; x < alleleMatrix.length; x++){
     for(let y = 0; y < alleleMatrix[x].length; y++){
-      par2_table.children[x].appendChild(createAllele(alleleMatrix[x][y]));
+      par2_table.children[x+1].appendChild(createAllele(alleleMatrix[x][y]));
     }
   }
   styleAlleles();

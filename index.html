@@ -48,6 +48,12 @@
         padding-left: 0px;
         padding-right: 0px;
       }
+      #par1-header{
+
+      }
+      #par2-header{
+        transform: rotate(-90deg);
+      }
     </style>
     <script src="./js/main.js" type="text/javascript" charset="utf-8"></script>
   </head>
@@ -79,36 +85,52 @@
       </td>
     </template>
     <template id="par1-gene">
-      <th class="par1"></th>
+      <th scope="col" class="par1"></th>
       <!-- <th class="par1"></th> -->
     </template>
     <template id="par2-gene">
       <tr>
-        <th class="par2"></th>
+        <th scope="row" class="par2"></th>
       </tr>
       <!-- <tr>
         <th class="par2"></th>
       </tr> -->
     </template>
+    <template id="par2-header-template">
+      <tr>
+        <th rowspan="5" scope="rowgroup" id="par2-header"></th>
+      </tr>
+    </template>
     <template id="allele-template">
       <td class="allele"></td>
     </template>
     <table id="Punnet">
-      <tr id="par1">
-        <th class="empty"></th>
-        <th class="par1" id="par1-a">G</th>
-        <th class="par1" id="par1-b">G</th>
-      </tr>
+      <col>
+      <col>
+      <colgroup></colgroup>
+      <thead>
+        <tr>
+          <td colspan="2" rowspan="2"></td>
+          <th scope="colgroup" colspan="2" id="par1-header">GG</th>
+        </tr>
+        <tr id="par1">
+          <th scope="col" class="par1" id="par1-a">G</th>
+          <th scope="col" class="par1" id="par1-b">G</th>
+        </tr>
+      </thead>
       <tbody id="par2">
         <tr>
-          <td class="par2" id="par2-a">g</td>
-          <td class="allele"></td>
-          <td class="allele"></td>
+          <th rowspan="3" scope="rowgroup" id="par2-header">gg</th>
         </tr>
         <tr>
-          <td class="par2" id="par2-b">g</td>
-          <td class="allele"></td>
-          <td class="allele"></td>
+          <th scope="row" class="par2" id="par2-a">g</th>
+          <td class="allele">Gg</td>
+          <td class="allele">Gg</td>
+        </tr>
+        <tr>
+          <th scope="row" class="par2" id="par2-b">g</th>
+          <td class="allele">Gg</td>
+          <td class="allele">Gg</td>
         </tr>
       </tbody>
     </table>
