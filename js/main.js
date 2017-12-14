@@ -115,7 +115,6 @@ Array.prototype.punnettFOIL = function(traitCount){
         traitString += whole[tInd][counter%2];
         stringCounter[whole[tInd][0].toUpperCase()]+=1/mod;
       }
-      //console.log(sStart)
       traits.push(traitString);
     }
   }
@@ -165,13 +164,7 @@ function styleAlleles(){
   }
 
   for(let Al in AlFrequency.alleles){
-    //let AlColor   = ;
-    //Math.round(Math.sin(AlFrequency.alleles[Al].freq*(AlFrequency._info._variance))*255).constrain(0,255)
-    //let AlBright  = 65;
     AlFrequency.alleles[Al].color = AlFrequency._info._colorArray[AlFrequency.alleles[Al].id];
-    // AlFrequency.alleles[Al].color = AlFrequency.alleles[Al].color
-    // .replace("$c", Math.round(AlColor))
-    // .replace("$b", AlBright);
   }
   window.freqBackup = Object.assign(new Object, AlFrequency);
   AlleleList.forEach((Al)=>{
@@ -292,7 +285,6 @@ function sortAlleles(prop, dir){
     AlFreq.alleles.sort((AlleleA, AlleleB) => {
       let AlleleAVal = AlleleA[sortType];
       let AlleleBVal = AlleleB[sortType];
-      console.log(prop, AlleleA[prop], AlleleAVal, AlleleB, AlleleBVal);
       // AlleleAVal = parseFloat(AlleleAVal.replace(/[ a-zA-Z]/g,""));
       // AlleleBVal = parseFloat(AlleleBVal.replace(/[ a-zA-Z]/g,""));
       if(dir == "asc"){
@@ -339,7 +331,6 @@ function updateGeneCount(e){
   document.querySelectorAll('.par2-gene').forEach((g)=>{
     g.value = geneSave.par2[[...g.parentElement.parentElement.children].indexOf(g.parentElement)] || "";
   });
-  console.log(geneSave)
 }
 
 window.addEventListener('load',function(){
