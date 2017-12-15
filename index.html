@@ -44,7 +44,8 @@
         border: black thin solid;
       }
       .par1-gene, .par2-gene{
-        border-collapse: collapse;
+        background-color: buttonface;
+        border-collapse: collapse;0
         padding-left: 0px;
         padding-right: 0px;
       }
@@ -54,6 +55,9 @@
       #par2-header{
         transform: rotate(-90deg);
       }
+      #subButton{
+        background-color: buttonface;
+      }
       .copy{
         background-color: buttonface;
         padding: 0px 0px 0px 0px;
@@ -62,19 +66,36 @@
       }
       #copyP1P2{
         width: 140px;
+      }
+      button{
         padding: 0px 0px 0px 0px;
         margin: 0px 0px 0px 0px;
         border: none;
         height: 100%;
         -webkit-appearance: textarea;
       }
-      #SubmitGenes{
-        width: 70px;
+      #parInput{
+        background-color: buttonface;
+      }
+      #copyP1P2{
+        background-color: buttonface;
+        width: 140px;
         padding: 0px 0px 0px 0px;
         margin: 0px 0px 0px 0px;
         border: none;
         height: 100%;
         -webkit-appearance: textarea;
+      }
+      select, #sortGo{
+        background-color: buttonface;
+        padding: 0px 0px 0px 0px;
+        margin: 0px 0px 0px 0px;
+        border: none;
+        height: 100%;
+        -webkit-appearance: textarea;
+      }
+      #sortTable{
+        background-color: buttonface;
       }
       #geneCount{
         text-align: center;
@@ -177,7 +198,7 @@
         </tr>
       </tbody>
     </table>
-    <table>
+    <table id="sortTable">
       <tr>
         <th>
           <select id="sortProp">
