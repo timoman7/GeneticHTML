@@ -11,6 +11,49 @@ let par2_table;
 let subButton;
 let even= 0;
 let odd = 1;
+let class_traits = {
+  Dimpled:{
+    D: 2,
+    R: 19
+  },
+  Free:{
+    D:19,
+    R:2
+  },
+  Widow:{
+    D:7,
+    R:14
+  },
+  PTC:{
+    D:13,
+    R:8
+  },
+  Left:{
+    D:16,
+    R:5
+  },
+  Bent:{
+    D:1,
+    R:20
+  },
+  Normal:{
+    D:19,
+    R:2
+  },
+  Pigment:{
+    D:18,
+    R:3
+  },
+  Mid:{
+    D:20,
+    R:1
+  },
+  Tongue:{
+    D:16,
+    R:5
+  }
+};
+
 
 String.prototype.toAllele = function(){
   let newString = [];
@@ -120,6 +163,43 @@ Array.prototype.punnettFOIL = function(traitCount){
   }
   return traits;
 };
+// COMBAK:  Create function to get chi squared distribution
+// NOTE:    Function is Summation of ((Observed - Expected)^2)/Expected
+// NOTE:    Observed is given
+// NOTE:    Expected is (Allele.count / freqBackup._info._size) * Summation of Observed
+function chiSquare(observed, _expectedList){
+  let chi_square = 0;
+  let expected = getExpected(_expectedList,observed);
+  for(let i = 0; i < observed.length; i++){
+    chi_square+=Math.pow(observed[i]-expected[i],2)/expected[i];
+  }
+  return chi_square;
+}
+
+function getExpected(list, observed){
+  let observedSize = observed.reduce((pv, cv) => pv+cv, 0);
+  let expected = [];
+  for(let i=0; i < list.length; i++){
+    expected.push((list[i].count / getAlleleTotal()._size)*observedSize);
+  }
+  return expected;
+}
+
+function getAllele(alleleName){
+  return window.freqBackup.alleles[alleleName];
+}
+
+function getAlleleTotal(){
+  return window.freqBackup._info;
+}
+
+function punnettChi(observed, alleles){
+  let expectedList = [];
+  for(let i=0; i < alleles.length; i++){
+    expectedList.push(getAllele(alleles[i]));
+  }
+  return chiSquare(observed, expectedList);
+}
 
 function EmptyPart(partType, extra){
   let emptyPart = document.createElement(partType);
@@ -313,7 +393,7 @@ function sortAlleles(prop, dir){
     });
   }else{
     AlFreq = Object.assign(new Object, window.freqBackup);
-    AlFreq = Object.toArray(AlFreq.alleles);
+    AlFreq.alleles = Object.toArray(AlFreq.alleles);
   }
   AlFreq.alleles = Array.toObject(AlFreq.alleles);
   updateFreqList(AlFreq);
@@ -359,6 +439,10 @@ function copyP1P2(){
   [...document.querySelectorAll('.par2-gene')].forEach((a)=>{
     a.value = p1List[[...a.parentElement.parentElement.children].indexOf(a.parentElement)];
   });
+}
+
+function test(){
+  return punnettChi([20,10,55,15],["AABB","AaBb","Aabb","AAbb"]);
 }
 
 window.addEventListener('load',function(){
